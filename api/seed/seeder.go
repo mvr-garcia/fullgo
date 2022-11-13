@@ -22,12 +22,14 @@ var users = []models.User{
 
 var posts = []models.Post{
 	{
-		Title:   "Title 1",
-		Content: "Hello world 1",
+		Title:    "Title 1",
+		Content:  "Hello world 1",
+		AuthorID: 1,
 	},
 	{
-		Title:   "Title 2",
-		Content: "Hello world 2",
+		Title:    "Title 2",
+		Content:  "Hello world 2",
+		AuthorID: 2,
 	},
 }
 
@@ -49,9 +51,6 @@ func Load(db *gorm.DB) {
 		log.Fatalf("cannot seed users table: %v", err)
 	}
 
-	for i, post := range posts {
-		post.AuthorID = users[i].ID
-	}
 	err = db.Create(&posts).Error
 	if err != nil {
 		log.Fatalf("cannot seed posts table: %v", err)
