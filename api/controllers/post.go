@@ -106,7 +106,7 @@ func (s *Server) UpdatePost(w http.ResponseWriter, r *http.Request) {
 	}
 
 	post := models.Post{}
-	err = s.DB.Debug().Model(&models.Post{}).Where("id = ?", pid).Take(&post).Error
+	err = s.DB.Model(&models.Post{}).Where("id = ?", pid).Take(&post).Error
 	if err != nil {
 		responses.ErrorResponse(w, http.StatusNotFound, errors.New("post not found"))
 		return
@@ -170,7 +170,7 @@ func (s *Server) DeletePost(w http.ResponseWriter, r *http.Request) {
 	}
 
 	post := models.Post{}
-	err = s.DB.Debug().Model(&models.Post{}).Where("id = ?", pid).Take(&post).Error
+	err = s.DB.Model(&models.Post{}).Where("id = ?", pid).Take(&post).Error
 	if err != nil {
 		responses.ErrorResponse(w, http.StatusNotFound, errors.New("post not found"))
 		return

@@ -1,7 +1,7 @@
-package fullgo
+package main
 
 import "github.com/mvr-garcia/fullgo/api"
 
-func Main() {
+func main() {
 	api.Run()
 }

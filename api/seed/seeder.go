@@ -3,8 +3,8 @@ package seed
 import (
 	"log"
 
-	"github.com/jinzhu/gorm"
 	"github.com/mvr-garcia/fullgo/api/models"
+	"gorm.io/gorm"
 )
 
 var users = []models.User{
@@ -32,29 +32,28 @@ var posts = []models.Post{
 }
 
 func Load(db *gorm.DB) {
-	err := db.Debug().DropTableIfExists(&models.Post{}, &models.User{}).Error
+
+	var err error
+
+	err = db.Migrator().DropTable(&models.Post{}, &models.User{})
 	if err != nil {
 		log.Fatalf("cannot drop table: %v", err)
 	}
-	err = db.Debug().AutoMigrate(&models.User{}, &models.Post{}).Error
+	err = db.AutoMigrate(&models.User{}, &models.Post{})
 	if err != nil {
 		log.Fatalf("cannot migrate table: %v", err)
 	}
 
-	err = db.Debug().Model(&models.Post{}).AddForeignKey("author_id", "users(id)", "cascade", "cascade").Error
+	err = db.Create(&users).Error
 	if err != nil {
-		log.Fatalf("attaching foreign key error: %v", err)
+		log.Fatalf("cannot seed users table: %v", err)
 	}
-	for i, _ := range users {
-		err = db.Debug().Model(&models.User{}).Create(&users[i]).Error
-		if err != nil {
-			log.Fatalf("cannot seed users table: %v", err)
-		}
-		posts[i].AuthorID = users[i].ID
 
-		err = db.Debug().Model(&models.Post{}).Create(&posts[i]).Error
-		if err != nil {
-			log.Fatalf("cannot seed posts table: %v", err)
-		}
+	for i, post := range posts {
+		post.AuthorID = users[i].ID
+	}
+	err = db.Create(&posts).Error
+	if err != nil {
+		log.Fatalf("cannot seed posts table: %v", err)
 	}
 }

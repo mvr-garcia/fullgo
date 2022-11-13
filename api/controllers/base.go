@@ -6,8 +6,9 @@ import (
 	"net/http"
 
 	"github.com/gorilla/mux"
-	"github.com/jinzhu/gorm"
 	"github.com/mvr-garcia/fullgo/api/models"
+	"gorm.io/driver/postgres"
+	"gorm.io/gorm"
 )
 
 type Server struct {
@@ -20,7 +21,7 @@ func (s *Server) Initialize(DbDriver, DbUser, DbPassword, DbPort, DbHost, DbName
 	var err error
 
 	dbURL := fmt.Sprintf("host=%s port=%s user=%s dbname=%s sslmode=disable password=%s", DbHost, DbPort, DbUser, DbName, DbPassword)
-	s.DB, err = gorm.Open(dbURL, DbDriver)
+	s.DB, err = gorm.Open(postgres.Open(dbURL), &gorm.Config{})
 	if err != nil {
 		fmt.Printf("Cannot connect to %s database", DbDriver)
 		log.Fatal("This is the error: ", err)
@@ -28,7 +29,7 @@ func (s *Server) Initialize(DbDriver, DbUser, DbPassword, DbPort, DbHost, DbName
 		fmt.Printf("We are connected to the %s database", DbDriver)
 	}
 
-	s.DB.Debug().AutoMigrate(&models.User{}, &models.Post{}) // Database migration
+	s.DB.AutoMigrate(&models.User{}, &models.Post{}) // Database migration
 	s.Router = mux.NewRouter()
 
 	s.InitializeRoutes()
